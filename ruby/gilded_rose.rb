@@ -6,6 +6,13 @@ class GildedRose
 
   def update_quality()
     @items.each do |item|
+      # until all item types implement :age,
+      # we call on those that do and skip to the next
+      if item.respond_to?(:age)
+        item.age
+        next
+      end
+
       if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
         if item.quality > 0
           if item.name != "Sulfuras, Hand of Ragnaros"
@@ -64,5 +71,14 @@ class Item
 
   def to_s()
     "#{@name}, #{@sell_in}, #{@quality}"
+  end
+end
+
+# ConjuredItem degrades twice as fast as normal items
+class ConjuredItem < Item
+  def age
+    @sell_in -= 1
+    @quality -= (@sell_in >= 0 ? 2 : 4)
+    @quality = 0 if @quality < 0
   end
 end
