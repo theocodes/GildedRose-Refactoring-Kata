@@ -1,3 +1,6 @@
+QUALITY_CAP = 50.freeze
+NORMAL_RATE = 1.freeze
+
 class GildedRose
 
   def initialize(items)
@@ -74,6 +77,21 @@ class Item
   end
 end
 
+# AgedItem increases in Quality the older it gets
+class AgedItem < Item
+  def age
+    if @quality >= QUALITY_CAP
+      @quality = QUALITY_CAP
+    elsif @sell_in <= 0
+      @quality += NORMAL_RATE * 2
+    else
+      @quality += NORMAL_RATE
+    end
+
+    @sell_in -= 1
+  end
+end
+
 # BackstagePassItem increases in Quality as its SellIn value approaches;
 #  -  Quality increases by 2 when there are 10 days or less
 #  -  Quality increases by 3 when there are 5 days or less
@@ -83,14 +101,14 @@ class BackstagePassItem < Item
     if @sell_in <= 0
       @quality = 0
     elsif @sell_in <= 5
-      @quality += 3
+      @quality += NORMAL_RATE + 2
     elsif @sell_in <= 10
-      @quality += 2
+      @quality += NORMAL_RATE + 1
     else
-      @quality += 1
+      @quality += NORMAL_RATE
     end
 
-    @quality = 50 if @quality > 50
+    @quality = QUALITY_CAP if @quality > QUALITY_CAP
     @sell_in -= 1
   end
 end

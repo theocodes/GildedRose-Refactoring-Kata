@@ -64,4 +64,32 @@ class TestUntitled < Test::Unit::TestCase
     end
   end
 
+  def test_aged_items
+    items = [
+      AgedItem.new(name="Aged Brie", sell_in=10, quality=0),
+      AgedItem.new(name="Aged Brie", sell_in=10, quality=49),
+    ]
+
+    20.times do
+      items.each_with_index do |item, i|
+        prev_s = items[i].sell_in
+        prev_q = items[i].quality
+        GildedRose.new(items).update_quality()
+        after_s = items[i].sell_in
+        after_q = items[i].quality
+
+        if after_q >= 50
+          assert_operator after_q, :<=, 50
+        else
+          if prev_s <= 0
+            assert_equal prev_q + 2, after_q, "Expected #{prev_q + 1} but got #{after_q} when sell_in was #{prev_s}"
+          else
+            assert_equal prev_q + 1, after_q, "Expected #{prev_q + 1} but got #{after_q} when sell_in was #{prev_s}"
+          end
+        end
+
+      end
+    end
+  end
+
 end
