@@ -74,11 +74,41 @@ class Item
   end
 end
 
+# BackstagePassItem increases in Quality as its SellIn value approaches;
+#  -  Quality increases by 2 when there are 10 days or less
+#  -  Quality increases by 3 when there are 5 days or less
+#  -  Quality drops to 0 after the concert
+class BackstagePassItem < Item
+  def age
+    if @sell_in <= 0
+      @quality = 0
+    elsif @sell_in <= 5
+      @quality += 3
+    elsif @sell_in <= 10
+      @quality += 2
+    else
+      @quality += 1
+    end
+
+    @quality = 50 if @quality > 50
+    @sell_in -= 1
+  end
+end
+
+# LegendaryItem items have fixed quality and never degrades
+# nor needs to be sold in any time frame
+class LegendaryItem < Item
+  def age
+    # NoOp
+  end
+end
+
 # ConjuredItem degrades twice as fast as normal items
 class ConjuredItem < Item
   def age
-    @sell_in -= 1
     @quality -= (@sell_in >= 0 ? 2 : 4)
     @quality = 0 if @quality < 0
+
+    @sell_in -= 1
   end
 end
